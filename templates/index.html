@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HookDrop Dashboard</title>
+    <script src="/static/htmx.min.js"></script> 
+    <style>
+        body { font-family: system-ui, sans-serif; background: #0f172a; color: #e2e8f0; margin: 0; padding: 2rem; }
+        h1 { color: #38bdf8; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; background: #1e293b; border-radius: 8px; overflow: hidden; }
+        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid #334155; }
+        th { background: #0f172a; color: #94a3b8; font-size: 0.875rem; text-transform: uppercase; }
+        pre { margin: 0; white-space: pre-wrap; font-family: monospace; color: #a7f3d0; }
+        .time { color: #94a3b8; font-size: 0.875rem; }
+    </style>
+</head>
+<body>
+    <h1>Webhook Dashboard</h1>
+    
+    <div style="background: #1e293b; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <p style="margin: 0; color: #94a3b8;">Your unique webhook URL:</p>
+            <!-- Added an ID to the code block so JS can find it -->
+            <code id="webhook-url" style="font-size: 1.2rem; color: #38bdf8;">http://localhost:8080/webhook/{{ .UserID }}</code>
+        </div>
+        <!-- 3 lines of JS to copy to clipboard -->
+        <button onclick="navigator.clipboard.writeText(document.getElementById('webhook-url').innerText); this.innerText='Copied!'; setTimeout(() => this.innerText='Copy', 2000);" 
+                style="padding: 0.5rem 1rem; background: #38bdf8; color: #0f172a; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">
+            Copy
+        </button>
+    </div>
+
+    <!-- Clear Button -->
+    <button hx-post="/webhook/clear" hx-target="#webhook-list" hx-swap="innerHTML" hx-confirm="Are you sure you want to delete all webhooks?"
+            style="margin-bottom: 1rem; padding: 0.5rem 1rem; background: #ef4444; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">
+        Clear All
+    </button>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Received At</th>
+                <th>Payload</th>
+                <th>Replay</th>
+            </tr>
+        </thead>
+        <tbody id="webhook-list" hx-get="/dashboard/rows" hx-trigger="load, every 2s [document.activeElement.name !== 'target_url']" hx-swap="innerHTML">
+            <!-- HTMX will replace everything inside here -->
+            <tr><td colspan="4" style="text-align: center;">Loading...</td></tr>
+        </tbody>
+    </table>
+</body>
+</html>

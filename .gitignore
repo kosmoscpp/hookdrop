@@ -1,0 +1,14 @@
+# Ignore the database and data folder
+data/
+*.db
+
+# Ignore the compiled Go binary
+hookdrop
+hookdrop.exe
+
+# Ignore OS generated files
+.DS_Store
+
+#kos 
+.kos-project
+.kosignore
