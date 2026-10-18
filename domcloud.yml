@@ -1,5 +1,10 @@
-version: 1.0
-type: go
-build:
+features:
+  - go
+nginx:
+  root: public_html/public
+  passenger:
+    enabled: "on"
+    app_start_command: env PORT=$PORT ./hookdrop
+commands:
+  - go mod download
   - go build -o hookdrop main.go
-start: ./hookdrop
