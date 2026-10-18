@@ -1,0 +1,5 @@
+version: 1.0
+type: go
+build:
+  - go build -o hookdrop main.go
+start: ./hookdrop
