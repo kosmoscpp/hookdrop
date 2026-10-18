@@ -20,8 +20,7 @@
     <div style="background: #1e293b; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
         <div>
             <p style="margin: 0; color: #94a3b8;">Your unique webhook URL:</p>
-            <!-- Added an ID to the code block so JS can find it -->
-            <code id="webhook-url" style="font-size: 1.2rem; color: #38bdf8;">http://localhost:8080/webhook/{{ .UserID }}</code>
+            <code id="webhook-url" style="font-size: 1.2rem; color: #38bdf8;">http://{{ .Host }}/webhook/{{ .UserID }}</code>
         </div>
         <!-- 3 lines of JS to copy to clipboard -->
         <button onclick="navigator.clipboard.writeText(document.getElementById('webhook-url').innerText); this.innerText='Copied!'; setTimeout(() => this.innerText='Copy', 2000);" 

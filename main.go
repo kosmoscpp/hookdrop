@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -28,6 +29,7 @@ type Webhook struct {
 // A struct to pass data to our HTML template
 type PageData struct {
 	UserID string
+	Host   string // Add this
 }
 
 func main() {
@@ -55,30 +57,26 @@ func main() {
 		http.Redirect(w, r, "/dashboard", http.StatusSeeOther)
 	})
 
-	// UPDATED: Dashboard with Cookie logic
+	// UPDATED: Dashboard with Cookie login
 	mux.HandleFunc("GET /dashboard", func(w http.ResponseWriter, r *http.Request) {
-		// 1. Try to get the cookie
 		cookie, err := r.Cookie("hookdrop_uid")
-
 		var userID string
 		if err != nil {
-			// 2. If no cookie exists, generate a new ID and set the cookie
 			userID = generateUserID()
 			newCookie := http.Cookie{
 				Name:     "hookdrop_uid",
 				Value:    userID,
 				Path:     "/",
-				MaxAge:   86400 * 30, // Lasts 30 days
+				MaxAge:   86400 * 30,
 				HttpOnly: true,
 			}
 			http.SetCookie(w, &newCookie)
 		} else {
-			// 3. We found the cookie!
 			userID = cookie.Value
 		}
 
-		// Pass the UserID to the HTML template
-		data := PageData{UserID: userID}
+		// Pass the Host (domain) to the template
+		data := PageData{UserID: userID, Host: r.Host}
 		tmplIndex.Execute(w, data)
 	})
 
@@ -88,6 +86,15 @@ func main() {
 	mux.HandleFunc("POST /webhook/clear", handleClear)
 	fmt.Printf("Starting server on http://localhost%s\n", port)
 	log.Fatal(http.ListenAndServe(port, mux))
+
+	// Read the port from the environment (for production), default to 8080
+	port = os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	fmt.Printf("Starting server on port %s\n", port)
+	log.Fatal(http.ListenAndServe(":"+port, mux))
 }
 
 func handleClear(w http.ResponseWriter, r *http.Request) {
