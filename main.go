@@ -87,14 +87,21 @@ func main() {
 	fmt.Printf("Starting server on http://localhost%s\n", port)
 	log.Fatal(http.ListenAndServe(port, mux))
 
-	// Read the port from the environment (for production), default to 8080
+	// Use = instead of := because port is already declared!
 	port = os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}
 
+	// Ensure the port has a colon (e.g., ":8080" instead of "8080")
+	if port[0] != ':' {
+		port = ":" + port
+	}
+
 	fmt.Printf("Starting server on port %s\n", port)
-	log.Fatal(http.ListenAndServe(":"+port, mux))
+
+	// Bind to 0.0.0.0 so Passenger can reach it
+	log.Fatal(http.ListenAndServe("0.0.0.0"+port, mux))
 }
 
 func handleClear(w http.ResponseWriter, r *http.Request) {
